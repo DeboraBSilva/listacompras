@@ -1,0 +1,23 @@
+<%- include('header.ejs') %>
+
+    <div class='container center entrada' >
+<span style='padding: 10px' class="pure-menu-heading">Alteração de Produto</span>
+
+<form action='/produto/update' method='post' class="pure-form pure-form-stacked">
+        <div >
+            <input name= 'id' type="hidden" value = "<%= id %>" />
+        </div>
+        <div >
+            <input name= 'resumo' class="pure-input-1" type="text" placeholder="Grupo do Produto" value = "<%= resumo %>" />
+        </div>
+        <div >
+            <input name= 'produto' class="pure-input-1" type="text" placeholder="Unidade e detalhes sobre o produto" value = "<%= descricao %>" />
+        </div>
+        <div >
+            <input name= 'preco' type="number" placeholder="Preço" step="0.01" min="0" max="100000" id="aligned-foo" value = "<%= preco %>" />
+        </div>
+        <button type="submit" class="pure-button">Enviar</button>
+</form>
+<div>
+
+<%- include('footer.ejs') %>

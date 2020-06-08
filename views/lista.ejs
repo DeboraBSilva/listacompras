@@ -1,0 +1,30 @@
+<%- include('header.ejs') %>
+    <div class='center' >
+    <div>
+        <button  style='padding: 5px; margin: 5px' class="pure-form" onclick="copiar()">Copiar Lista</button>
+        <span id='ok' style='color: #f44336;' ></span> 
+    </div>
+    <div>
+        </p><span class='texto'>Lista para entrega:</span><br></p>
+        <%  lista.forEach( item => { %>
+            <% if (item.quantidade > 0) { %>
+            <span class='texto'><%= item.quantidade + "  " + item.descricao %></span><br>  
+            <% } %>
+        <% }) %>
+    </div>
+    <script>
+        function copiar() {
+            const arr = Array.from(document.getElementsByClassName("texto"))
+            const copyText= arr.reduce( (str, item) => str += item.textContent + '\n','')
+            const textArea = document.createElement("textarea")
+            textArea.value = copyText
+            document.body.appendChild(textArea)
+            textArea.select()
+            document.execCommand("Copy")
+            textArea.remove()
+            document.getElementById("ok").textContent = 'Cópia efetuada'
+        }
+    </script>
+
+<%- include('footer.ejs') %>
+

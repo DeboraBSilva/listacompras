@@ -1,0 +1,102 @@
+<%- include('header.ejs') %>
+    <div class='box'>
+        <label for="parcela">Parcela:</label>
+        <select name="parcela" id="parcela">
+            <option value="1">&nbsp;&nbsp;&nbsp;1</option>
+            <option value="10">&nbsp;&nbsp;10</option>
+            <option value="100">100</option>
+            <option value=".5">&nbsp;0,5</option>
+        </select>
+    </div>
+    <div class='center' >
+    <h3>Total: R$ 0.00</h3>
+
+    <form style='padding: 5px; margin: 5px' class="pure-form" action='/lista' method='post' onsubmit='enviar();'>
+        <input type='hidden' name='lista' id='lista' />
+        <input class="pure-button" type='submit' value='Gerar Lista' />
+    </form>
+    
+
+   
+    <table id="tbl" cellspacing="0" >
+        <thead>
+                <th style="border-bottom: 1px solid #ccc;"></th>
+                <th style="border-bottom: 1px solid #ccc;">Qtd</th>
+                <th style="border-bottom: 1px solid #ccc;">Produto</th>
+                <th style="border-bottom: 1px solid #ccc;"></th>
+        </thead>
+        <%  lista.forEach( produto => { %>
+        <tr>
+            <td style="border-bottom: 1px solid #ccc;" >
+                <button class="button-success pure-button" style="background: rgb(28, 184, 65);margin: 0px 0px 3px 0px;'" onClick="selecao('<%= produto.indice %>', 'mais')" >&plus;</button>
+                <button class="button-warning pure-button" style="background: rgb(202, 60, 60);" onClick="selecao('<%= produto.indice %>', 'menos')" >&minus;</button>
+            </td>
+            <td style="border-bottom: 1px solid #ccc; text-align: center;" class="quantidade"><%= produto.quantidade %></td>
+            <td style="border-bottom: 1px solid #ccc;" class="resumo"><span style="color:blue"><%= produto.resumo %></span> <br> <%= produto.descricao %></td>
+            <td style="border-bottom: 1px solid #ccc;">
+                <button class="button-secondary pure-button" style="background: rgb(223, 117, 20);" onClick="alterar('<%= produto.indice %>')" >&#9851;</button>
+            </td>
+        </tr>
+        <% }) %>
+    </table>
+    </div>
+    <form  style='display: none' action="produto/produto" method="POST" id="formProdutoAlterar" >
+        <input type="hidden" id="produtoAlterar" name="produtoAlterar" value=""/>
+    </form>
+    <script>
+        var lista_tudo = [{}]
+        <% lista.forEach(item => { %>
+            {
+                let p = {}
+                p.indice = <%= item.indice %>
+                p.id = <%= item.id %>
+                p.resumo = "<%= item.resumo %>"
+                p.descricao = "<%= item.descricao %>"
+                p.preco = <%= item.preco %>
+                p.quantidade = <%= item.quantidade %>
+                lista_tudo.push(p)
+            }
+        <% }) %>
+        function selecao(indice, op){
+            let parcela = 0
+            if(op == 'mais'){
+                parcela = parseFloat(document.getElementById('parcela').value)
+            } else {
+                parcela = -parseFloat(document.getElementById('parcela').value)
+             }
+            operacao(indice, parcela)
+        }
+        function operacao(indice, parcela) {
+            const myTable = document.getElementById('tbl')
+            let quantidade = parseFloat(myTable.rows[indice].cells[1].innerHTML) + parcela
+            if(quantidade < 0){
+                quantidade = 0
+            }
+            myTable.rows[indice].cells[1].innerHTML = quantidade
+            lista_tudo[indice].quantidade = quantidade
+            let total = lista_tudo.reduce((total, item) => {
+                if (parseFloat(item.quantidade) > 0) {
+                    total += parseFloat(item.preco) * parseFloat(item.quantidade)
+                }
+                return total 
+            },0)
+            const f = total.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'});
+            document.querySelector('h3').innerHTML = "Total: " + f
+        }
+
+        function enviar() {
+            document.getElementById('lista').value = JSON.stringify(lista_tudo);
+        }
+
+        function alterar(indice) {
+            const produto = {}
+            produto.id = lista_tudo[indice].id
+            produto.resumo = lista_tudo[indice].resumo
+            produto.produto = lista_tudo[indice].descricao
+            produto.preco = lista_tudo[indice].preco
+            document.getElementById('produtoAlterar').value = JSON.stringify(produto);
+            document.getElementById('formProdutoAlterar').submit();
+        }
+    </script>
+
+<%- include('footer.ejs') %>
